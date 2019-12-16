@@ -74,11 +74,11 @@ public class JobsAx implements DataAx<Job> {
 	}
 
 	@Override
-	public List<Job> search(Map<String, Object> criteria) {
+	public List<Job> search(Map<String, Object> criteria,SearchMode mode) {
 		final List<Job> foundList=new ArrayList<>();
 		jobList.stream().forEach(
 				(Job j)->{
-				if(match(j,criteria)) {
+				if(match(j,criteria,mode)) {
 					foundList.add(j);
 				}
 			}
@@ -98,10 +98,10 @@ public class JobsAx implements DataAx<Job> {
 	}
 
 	@Override
-	public int delete(Map<String, Object> criteria) {
+	public int delete(Map<String, Object> criteria,SearchMode mode) {
 		int deleted=0;
 		for(Job job:jobList) {
-			if(match(job,criteria)) {
+			if(match(job,criteria,mode)) {
 				jobList.remove(job);
 				deleted++;
 			}
@@ -128,7 +128,7 @@ public class JobsAx implements DataAx<Job> {
 	public int update(Job j, String[] attributeNames) {
 		int updated=0;
 		for(Job job:jobList) {
-			if(match(job,j,attributeNames) && change(job,j,attributeNames)) {
+			if(match(job,j,attributeNames,SearchMode.AND) && change(job,j,attributeNames)) {
 				updated++;
 			}
 		}
@@ -136,7 +136,7 @@ public class JobsAx implements DataAx<Job> {
 	}
 
 	@Override
-	public boolean match(Job j, Map<String, Object> criteria) {
+	public boolean match(Job j, Map<String, Object> criteria,SearchMode mode) {
 		int matchingCrits=0;
 		for(Entry<String,Object> es:criteria.entrySet()) {
 			Object value=es.getValue();
@@ -204,7 +204,7 @@ public class JobsAx implements DataAx<Job> {
 	}
 
 	@Override
-	public boolean match(Job j1, Job j2, String[] attributeNames) {
+	public boolean match(Job j1, Job j2, String[] attributeNames,SearchMode mode) {
 		int matchingCrits=0;
 		for(String an:attributeNames) {
 			switch(an) {
@@ -329,7 +329,7 @@ public class JobsAx implements DataAx<Job> {
 	@Override
 	public boolean add(Job j) {
 		for(Job job:jobList) {
-			if(match(job,j,new String[] {"id"})) {
+			if(match(job,j,new String[] {"id"},SearchMode.AND)) {
 				return false;
 			}
 		}

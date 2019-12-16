@@ -1,6 +1,10 @@
 package vmd;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
+import org.zkoss.bind.annotation.Command;
 
 import biz.Job;
 import biz.Person;
@@ -32,5 +36,42 @@ public class PeopleViewModel {
 			}
 			System.out.println("---------");
 		}
+	}
+	public PeopleViewModel() {
+		this.setPeopleList(peopleList=myPeopleAx.fetchAll());
+	}
+	private PeopleAx myPeopleAx=PeopleAx.getUniqueInstance();
+	private List<Person> peopleList;
+	private Person chosenPerson;
+	private String searchTerm;
+	public String getSearchTerm() {
+		return searchTerm;
+	}
+	public void setSearchTerm(String searchTerm) {
+		this.searchTerm = searchTerm;
+	}
+	public Person getChosenPerson() {
+		return chosenPerson;
+	}
+	public void setChosenPerson(Person chosenPerson) {
+		this.chosenPerson = chosenPerson;
+	}
+	public PeopleAx getMyPeopleAx() {
+		return myPeopleAx;
+	}
+	public void setMyPeopleAx(PeopleAx myPeopleAx) {
+		this.myPeopleAx = myPeopleAx;
+	}
+	public List<Person> getPeopleList() {
+		return peopleList;
+	}
+	public void setPeopleList(List<Person> peopleList) {
+		this.peopleList = peopleList;
+	}
+	@Command
+	public void search() {
+		Map<String,Object> criteria=new HashMap<>();
+		criteria.put("firstName", "")
+		this.setPeopleList(myPeopleAx.search(criteria));
 	}
 }
