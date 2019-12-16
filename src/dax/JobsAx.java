@@ -1,6 +1,7 @@
 package dax;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -8,13 +9,6 @@ import java.util.Map.Entry;
 import biz.Job;
 
 public class JobsAx implements DataAx<Job> {
-	public static final String 
-		ID="id",
-		COMPANY_NAME="companyName",
-		TITLE="title",
-		DESCRIPTION="description",
-		REQUIRED_QUALIFICATIONS="requiredQualifications",
-		REQUIRED_ABILITIES="requiredAbilities";
 	private static JobsAx uniqueInstance=new JobsAx();
 	public static JobsAx getUniqueInstance() {
 		return uniqueInstance;
@@ -74,7 +68,7 @@ public class JobsAx implements DataAx<Job> {
 	}
 
 	@Override
-	public List<Job> search(Map<String, Object> criteria,SearchMode mode) {
+	public List<Job> search(Map<SearchField, Object> criteria,SearchMode mode) {
 		final List<Job> foundList=new ArrayList<>();
 		jobList.stream().forEach(
 				(Job j)->{
@@ -98,7 +92,7 @@ public class JobsAx implements DataAx<Job> {
 	}
 
 	@Override
-	public int delete(Map<String, Object> criteria,SearchMode mode) {
+	public int delete(Map<SearchField, Object> criteria,SearchMode mode) {
 		int deleted=0;
 		for(Job job:jobList) {
 			if(match(job,criteria,mode)) {
@@ -125,7 +119,7 @@ public class JobsAx implements DataAx<Job> {
 	}
 
 	@Override
-	public int update(Job j, String[] attributeNames) {
+	public int update(Job j, SearchField[] attributeNames) {
 		int updated=0;
 		for(Job job:jobList) {
 			if(match(job,j,attributeNames,SearchMode.AND) && change(job,j,attributeNames)) {
@@ -136,34 +130,46 @@ public class JobsAx implements DataAx<Job> {
 	}
 
 	@Override
-	public boolean match(Job j, Map<String, Object> criteria,SearchMode mode) {
+	public boolean match(Job j, Map<SearchField, Object> criteria,SearchMode mode) {
 		int matchingCrits=0;
-		for(Entry<String,Object> es:criteria.entrySet()) {
+		for(Entry<SearchField,Object> es:criteria.entrySet()) {
 			Object value=es.getValue();
 			switch(es.getKey()) {
 
-				case ID:
+				case JOB_ID:
 					if(Integer.valueOf(j.getId()).equals((Integer)value)) {
+						if(mode==SearchMode.OR) {
+							return true;
+						}
 						matchingCrits++;
 					}
 					break;
-				case COMPANY_NAME:
+				case JOB_COMPANY_NAME:
 					if(j.getCompanyName().contains((String)value)){
+						if(mode==SearchMode.OR) {
+							return true;
+						}
 						matchingCrits++;
 					}
 					break;
-				case TITLE:
+				case JOB_TITLE:
 					if(j.getTitle().contains((String)value)){
+						if(mode==SearchMode.OR) {
+							return true;
+						}
 						matchingCrits++;
 					}
 					break;
-				case DESCRIPTION:
+				case JOB_DESCRIPTION:
 					String target=j.getDescription(), model=(String)value;
 					if(target.contains(model) || model.contentEquals(target)){
+						if(mode==SearchMode.OR) {
+							return true;
+						}
 						matchingCrits++;
 					}
 					break;
-				case REQUIRED_QUALIFICATIONS:
+				case JOB_REQUIRED_QUALIFICATIONS:
 					String[] rqus=j.getRequiredQualifications();
 					String[] qus=(String[])value;
 					int cptOKs=0;
@@ -176,10 +182,13 @@ public class JobsAx implements DataAx<Job> {
 						}
 					}
 					if(cptOKs>=rqus.length) {
+						if(mode==SearchMode.OR) {
+							return true;
+						}
 						matchingCrits++;
 					}
 					break;
-				case REQUIRED_ABILITIES:
+				case JOB_REQUIRED_ABILITIES:
 					String[] rabs=j.getRequiredAbilities();
 					String[] abs=(String[])value;
 					int oks=0;
@@ -192,6 +201,9 @@ public class JobsAx implements DataAx<Job> {
 						}
 					}
 					if(oks>=rabs.length) {
+						if(mode==SearchMode.OR) {
+							return true;
+						}
 						matchingCrits++;
 					}
 					break;
@@ -204,33 +216,45 @@ public class JobsAx implements DataAx<Job> {
 	}
 
 	@Override
-	public boolean match(Job j1, Job j2, String[] attributeNames,SearchMode mode) {
+	public boolean match(Job j1, Job j2, SearchField[] attributeNames,SearchMode mode) {
 		int matchingCrits=0;
-		for(String an:attributeNames) {
+		for(SearchField an:attributeNames) {
 			switch(an) {
 
-			case ID:
+			case JOB_ID:
 				if(j1.getId()==j2.getId()) {
+					if(mode==SearchMode.OR) {
+						return true;
+					}
 					matchingCrits++;
 				}
 				break;
-			case COMPANY_NAME:
+			case JOB_COMPANY_NAME:
 				if(j1.getCompanyName().equals(j2.getCompanyName())){
+					if(mode==SearchMode.OR) {
+						return true;
+					}
 					matchingCrits++;
 				}
 				break;
-			case TITLE:
+			case JOB_TITLE:
 				if(j1.getCompanyName().equals(j2.getCompanyName())){
+					if(mode==SearchMode.OR) {
+						return true;
+					}
 					matchingCrits++;
 				}
 				break;
-			case DESCRIPTION:
+			case JOB_DESCRIPTION:
 				String target=j1.getDescription(), model=j2.getDescription();
 				if(target.contains(model) || model.contentEquals(target)){
+					if(mode==SearchMode.OR) {
+						return true;
+					}
 					matchingCrits++;
 				}
 				break;
-			case REQUIRED_QUALIFICATIONS:
+			case JOB_REQUIRED_QUALIFICATIONS:
 				String[] rqus=j1.getRequiredQualifications();
 				String[] qus=j2.getRequiredQualifications();
 				int cptOKs=0;
@@ -243,10 +267,13 @@ public class JobsAx implements DataAx<Job> {
 					}
 				}
 				if(cptOKs>=rqus.length) {
+					if(mode==SearchMode.OR) {
+						return true;
+					}
 					matchingCrits++;
 				}
 				break;
-			case REQUIRED_ABILITIES:
+			case JOB_REQUIRED_ABILITIES:
 				String[] rabs=j1.getRequiredAbilities();
 				String[] abs=j2.getRequiredAbilities();
 				int oks=0;
@@ -259,6 +286,9 @@ public class JobsAx implements DataAx<Job> {
 					}
 				}
 				if(oks>=rabs.length) {
+					if(mode==SearchMode.OR) {
+						return true;
+					}
 					matchingCrits++;
 				}
 				break;
@@ -269,27 +299,27 @@ public class JobsAx implements DataAx<Job> {
 	}
 
 	@Override
-	public boolean change(Job j1, Job j2,String[] attributeNames) {
+	public boolean change(Job j1, Job j2,SearchField[] attributeNames) {
 		int matchingCrits=0;
-		for(String an:attributeNames) {
+		for(SearchField an:attributeNames) {
 			switch(an) {
-			case COMPANY_NAME:
+			case JOB_COMPANY_NAME:
 				if(j1.getCompanyName().equals(j2.getCompanyName())){
 					matchingCrits++;
 				}
 				break;
-			case TITLE:
+			case JOB_TITLE:
 				if(j1.getCompanyName().equals(j2.getCompanyName())){
 					matchingCrits++;
 				}
 				break;
-			case DESCRIPTION:
+			case JOB_DESCRIPTION:
 				String target=j1.getDescription(), model=j2.getDescription();
 				if(target.contains(model) || model.contentEquals(target)){
 					matchingCrits++;
 				}
 				break;
-			case REQUIRED_QUALIFICATIONS:
+			case JOB_REQUIRED_QUALIFICATIONS:
 				String[] rqus=j1.getRequiredQualifications();
 				String[] qus=j2.getRequiredQualifications();
 				int cptOKs=0;
@@ -305,7 +335,7 @@ public class JobsAx implements DataAx<Job> {
 					matchingCrits++;
 				}
 				break;
-			case REQUIRED_ABILITIES:
+			case JOB_REQUIRED_ABILITIES:
 				String[] rabs=j1.getRequiredAbilities();
 				String[] abs=j2.getRequiredAbilities();
 				int oks=0;
@@ -329,7 +359,7 @@ public class JobsAx implements DataAx<Job> {
 	@Override
 	public boolean add(Job j) {
 		for(Job job:jobList) {
-			if(match(job,j,new String[] {"id"},SearchMode.AND)) {
+			if(match(job,j,new SearchField[] {SearchField.JOB_ID},SearchMode.AND)) {
 				return false;
 			}
 		}
@@ -337,4 +367,14 @@ public class JobsAx implements DataAx<Job> {
 		return true;
 	}
 
+	@Override
+	public List<Job> search(String term) {
+		Map<SearchField,Object> crit=new HashMap<>();
+		crit.put(SearchField.JOB_COMPANY_NAME,term);
+		crit.put(SearchField.JOB_TITLE,term);
+		crit.put(SearchField.JOB_DESCRIPTION,term);
+		crit.put(SearchField.JOB_REQUIRED_QUALIFICATIONS,term);
+		crit.put(SearchField.JOB_REQUIRED_ABILITIES,term);
+		return search(crit,SearchMode.OR);
+	}
 }

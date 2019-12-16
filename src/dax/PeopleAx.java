@@ -10,13 +10,6 @@ import biz.Person;
 
 public class PeopleAx implements DataAx<Person> {
 	private static PeopleAx uniqueInstance=new PeopleAx();
-	public static final String ID="id", 
-		USER_NAME="userName",
-		FIRST_NAME="firstName",
-		LAST_NAME="lastName",
-		EMAIL="email",
-		STATUS="status",
-		PASSWORD="status";
 	public static PeopleAx getUniqueInstance() {
 		return uniqueInstance;
 	}
@@ -48,7 +41,7 @@ public class PeopleAx implements DataAx<Person> {
 	}
 
 	@Override
-	public List<Person> search(Map<String, Object> criteria,SearchMode mode) {
+	public List<Person> search(Map<SearchField, Object> criteria,SearchMode mode) {
 		final List<Person> pList=peopleList;
 		peopleList.stream().forEach((Person p)->{if(match(p,criteria,mode))pList.add(p);});
 		return pList;
@@ -66,7 +59,7 @@ public class PeopleAx implements DataAx<Person> {
 	}
 
 	@Override
-	public int delete(Map<String, Object> criteria,SearchMode mode) {
+	public int delete(Map<SearchField, Object> criteria,SearchMode mode) {
 		int total=0;
 		for(Person pers:peopleList) {
 			if(match(pers,criteria,mode)) {
@@ -94,7 +87,7 @@ public class PeopleAx implements DataAx<Person> {
 	}
 
 	@Override
-	public int update(Person p, String[] attributeNames) {
+	public int update(Person p, SearchField[] attributeNames) {
 		int total=0;
 		for(Person pers:peopleList) {
 			if(match(pers,p,attributeNames,SearchMode.AND) && change(pers,p,attributeNames)) {
@@ -104,111 +97,108 @@ public class PeopleAx implements DataAx<Person> {
 		return total;
 	}
 	@Override
-	public boolean match(Person p, Map<String, Object> criteria,SearchMode mode) {
-		for(Entry<String,Object> es:criteria.entrySet()) {
+	public boolean match(Person p, Map<SearchField, Object> criteria,SearchMode mode) {
+		for(Entry<SearchField,Object> es:criteria.entrySet()) {
 			Object value=es.getValue();
-
 			switch(es.getKey()) {
-				case ID:		
+				case PERSON_ID:
 					if(mode==SearchMode.AND && !Integer.valueOf(p.getId()).equals((Integer)value)) {
 						return false;
 					}else if (mode==SearchMode.OR && Integer.valueOf(p.getId()).equals((Integer)value)) {
 						return true;
 					}
 					break;
-				case USER_NAME:
+				case PERSON_USER_NAME:
 					if(mode==SearchMode.AND && !p.getUserName().equals(value)) {
 						return false;
 					} else if(mode==SearchMode.OR && p.getUserName().equals(value)) {
 						return true;
 					}
 					break;
-				case EMAIL:
+				case PERSON_EMAIL:
 					if(mode==SearchMode.AND && !p.getEmail().equals(value)) {
 						return false;
 					}else if(mode==SearchMode.OR && p.getEmail().equals(value)) {
 						return true;
 					}
 					break;
-				case PASSWORD:
-					if(mode==SearchMode.AND && !p.getPassword().equals(value)) {
-						return false;
-					} else if(mode==SearchMode.OR && p.getPassword().equals(value)) {
-						return true;
-					}
-					break;
-				case FIRST_NAME:
-					if(mode==SearchMode.AND && !p.getFirstName().equals(value)) {
-						return false;
-					} else if(mode==SearchMode.OR && p.getFirstName().equals(value)) {
-						return true;
-					}
-					break;
-				case LAST_NAME:
-					if(mode==SearchMode.AND && !p.getLastName().equals(value)) {
-						return false;
-					}else if(mode==SearchMode.OR && p.getLastName().equals(value)) {
-						return true;
-					}
-					break;
-				case STATUS:
-					if(mode==SearchMode.AND && !p.getStatus().equals((Person.Status.valueOf(value.toString())))){
-						return false;
-					}else if(mode==SearchMode.OR && !p.getStatus().equals((Person.Status.valueOf(value.toString())))){
-						return true;
-					}
-					break;
-			}
+			  case PERSON_PASSWORD:
+				  if(mode==SearchMode.AND && !p.getPassword().equals(value)) {
+					  return false;
+				  } else if(mode==SearchMode.OR && p.getPassword().equals(value)){
+					  return true; 
+				  }
+				  break; 
+			 case PERSON_FIRST_NAME: 
+				 if(mode==SearchMode.AND && !p.getFirstName().equals(value)) { 
+					 return false;
+				 }	else if(mode==SearchMode.OR && p.getFirstName().equals(value)) {
+					 return true;
+				 }
+				 break; 
+			  case PERSON_LAST_NAME: if(mode==SearchMode.AND && !p.getLastName().equals(value)) {
+				  return false;
+				  }else if(mode==SearchMode.OR && p.getLastName().equals(value)) {
+					  return true;
+				  }
+				  break;
+			  case PERSON_STATUS:
+			  if(mode==SearchMode.AND &&
+			  !p.getStatus().equals((Person.Status.valueOf(value.toString())))){ return
+			  false; }else if(mode==SearchMode.OR &&
+			  !p.getStatus().equals((Person.Status.valueOf(value.toString())))){ return
+			  true; } break;
+			 }
 		}
 		return true;
 	}
 	@Override
-	public boolean match(Person p1, Person p2, String[] attributeNames,SearchMode mode) {
-		for(String attNam:attributeNames) {
-			switch(attNam) {
-			case ID:
-				if(mode==SearchMode.AND && (p1.getId()!=p2.getId()) {
+	public boolean match(Person p1, Person p2, SearchField[] attributeNames,SearchMode mode) {
+		for(SearchField attNam:attributeNames) {
+			switch(attNam){
+			case PERSON_ID:
+				if(mode==SearchMode.AND && (p1.getId()!=p2.getId())) {
 					return false;
 				}else if(mode==SearchMode.OR && p1.getId()==p2.getId()) {
 					return true;
 				}
 				break;
-			case USER_NAME:
+			case PERSON_USER_NAME:
 				if(mode==SearchMode.AND && !p1.getUserName().equals(p2.getUserName())) {
 					return false;
 				}else if(mode==SearchMode.OR && p1.getId()==p2.getId()) {
 					return true;
 				}
 				break;
-			case EMAIL:
+			case PERSON_EMAIL:
 				if(mode==SearchMode.AND && !p1.getEmail().equals(p2.getEmail())) {
 					return false;
 				}else if(mode==SearchMode.OR && p1.getEmail().equals(p2.getEmail())) {
 					return true;
 				}
 				break;
-			case PASSWORD:
+			case PERSON_PASSWORD:
 				if(mode==SearchMode.AND && !p1.getPassword().equals(p2.getPassword())) {
 					return false;
 				}else if(mode==SearchMode.OR && p1.getPassword().equals(p2.getPassword())) {
 					return true;
 				}
 				break;
-			case FIRST_NAME:
+			case PERSON_FIRST_NAME:
 				if(mode==SearchMode.AND && !p1.getFirstName().equals(p2.getFirstName())) {
 					return false;
 				} else if(mode==SearchMode.OR && p1.getFirstName().equals(p2.getFirstName())) {
 					return true;
 				}
 				break;
-			case LAST_NAME:
+			case PERSON_LAST_NAME:
 				if(mode==SearchMode.AND && !p1.getLastName().equals(p2.getLastName())) {
 					return false;
 				} else if(mode==SearchMode.OR && p1.getLastName().equals(p2.getLastName())) {
 					return true;
 				}
 				break;
-			case STATUS:
+			case PERSON_STATUS:
 				if(mode==SearchMode.AND && !p1.getStatus().equals(p2.getStatus())){
 					return false;
 				} else if(mode==SearchMode.OR && p1.getStatus().equals(p2.getStatus())){
@@ -220,33 +210,35 @@ public class PeopleAx implements DataAx<Person> {
 		return true;
 	}
 	@Override
-	public boolean change(Person target, Person model,String[] attributeNames) {		
+	public boolean change(Person target, Person model,SearchField[] attributeNames) {		
 		int total=0;
-		for(String attNam:attributeNames) {
+		for(SearchField attNam:attributeNames) {
 			switch(attNam) {
-			case USER_NAME:
+			case PERSON_USER_NAME:
 				target.setUserName(model.getUserName());
 				total++;
 				break;
-			case EMAIL:
+			case PERSON_EMAIL:
 				target.setEmail(model.getEmail());
 				total++;
 				break;
-			case PASSWORD:
+			case PERSON_PASSWORD:
 				target.setPassword(model.getPassword());
 				total++;
 				break;
-			case FIRST_NAME:
+			case PERSON_FIRST_NAME:
 				target.setFirstName(model.getFirstName());
 				total++;
 				break;
-			case LAST_NAME:
+			case PERSON_LAST_NAME:
 				target.setLastName(model.getLastName());
 				total++;
 				break;
-			case STATUS:
+			case PERSON_STATUS:
 				target.setStatus(model.getStatus());
 				total++;
+				break;
+			default:
 				break;
 			}
 		}
@@ -254,11 +246,11 @@ public class PeopleAx implements DataAx<Person> {
 	}
 	@Override
 	public boolean add(Person p) {
-		Map<String,Object> crit=new HashMap<>();
-		crit.put(EMAIL, p.getEmail());
-		crit.put(USER_NAME, p.getUserName());
-		crit.put(FIRST_NAME,p.getFirstName());
-		crit.put(LAST_NAME,p.getLastName());
+		Map<SearchField,Object> crit=new HashMap<>();
+		crit.put(SearchField.PERSON_EMAIL, p.getEmail());
+		crit.put(SearchField.PERSON_USER_NAME, p.getUserName());
+		crit.put(SearchField.PERSON_FIRST_NAME,p.getFirstName());
+		crit.put(SearchField.PERSON_LAST_NAME,p.getLastName());
 		List<Person> duplis=search(crit,SearchMode.OR);
 		if(duplis.isEmpty()) {
 			peopleList.add(p);
@@ -268,11 +260,11 @@ public class PeopleAx implements DataAx<Person> {
 	}
 	@Override
 	public List<Person> search(String term) {
-		Map<String,Object> crit=new HashMap<>();
-		crit.put(EMAIL, term);
-		crit.put(USER_NAME, term);
-		crit.put(FIRST_NAME, term);
-		crit.put(LAST_NAME, term);
+		Map<SearchField,Object> crit=new HashMap<>();
+		crit.put(SearchField.PERSON_EMAIL, term);
+		crit.put(SearchField.PERSON_USER_NAME, term);
+		crit.put(SearchField.PERSON_FIRST_NAME, term);
+		crit.put(SearchField.PERSON_LAST_NAME, term);
 		return search(crit,SearchMode.OR);
 	}
 }

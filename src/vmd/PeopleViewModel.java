@@ -10,6 +10,8 @@ import biz.Job;
 import biz.Person;
 import dax.JobsAx;
 import dax.PeopleAx;
+import dax.SearchField;
+import dax.SearchMode;
 
 public class PeopleViewModel {
 	public static void main(String args[]) {
@@ -70,8 +72,12 @@ public class PeopleViewModel {
 	}
 	@Command
 	public void search() {
-		Map<String,Object> criteria=new HashMap<>();
-		criteria.put("firstName", "")
-		this.setPeopleList(myPeopleAx.search(criteria));
+		Map<SearchField,Object> criteria=new HashMap<>();
+		criteria.put(SearchField.PERSON_FIRST_NAME, this.searchTerm);
+		criteria.put(SearchField.PERSON_EMAIL, this.searchTerm);
+		criteria.put(SearchField.PERSON_LAST_NAME, this.searchTerm);
+		criteria.put(SearchField.PERSON_STATUS, this.searchTerm);
+		criteria.put(SearchField.PERSON_USER_NAME, this.searchTerm);
+		this.setPeopleList(myPeopleAx.search(criteria,SearchMode.OR));
 	}
 }
