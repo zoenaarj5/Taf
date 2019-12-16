@@ -7,6 +7,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import biz.Person;
+import search.SearchField;
+import search.SearchMode;
 
 public class PeopleAx implements DataAx<Person> {
 	private static PeopleAx uniqueInstance=new PeopleAx();

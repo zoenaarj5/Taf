@@ -10,8 +10,8 @@ import biz.Job;
 import biz.Person;
 import dax.JobsAx;
 import dax.PeopleAx;
-import dax.SearchField;
-import dax.SearchMode;
+import search.SearchField;
+import search.SearchMode;
 
 public class PeopleViewModel {
 	public static void main(String args[]) {

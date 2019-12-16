@@ -3,6 +3,9 @@ package dax;
 import java.util.List;
 import java.util.Map;
 
+import search.SearchField;
+import search.SearchMode;
+
 
 public interface DataAx<T> {
 	List<T> fetchAll();

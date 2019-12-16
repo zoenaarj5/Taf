@@ -7,6 +7,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import biz.Job;
+import search.SearchField;
+import search.SearchMode;
 
 public class JobsAx implements DataAx<Job> {
 	private static JobsAx uniqueInstance=new JobsAx();
